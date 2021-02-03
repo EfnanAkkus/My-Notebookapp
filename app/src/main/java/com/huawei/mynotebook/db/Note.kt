@@ -5,8 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Note(//Note Entity yani burda bizim veritabanı tablomuz oluyor BU tablo için 3 tane coloum var
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
+
     val title: String,
     val note: String
-)
+){
+    @PrimaryKey(autoGenerate = true)
+    var id: Int=0
+}

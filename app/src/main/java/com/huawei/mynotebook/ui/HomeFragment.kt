@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.fragment_home.*
 import java.util.*
 
 
-class HomeFragment : Fragment() {
+class HomeFragment : BaseFragment() {
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,

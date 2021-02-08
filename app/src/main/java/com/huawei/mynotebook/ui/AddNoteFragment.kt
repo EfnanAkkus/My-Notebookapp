@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.Navigation
 import com.huawei.mynotebook.R
 import com.huawei.mynotebook.db.Note
 import com.huawei.mynotebook.db.NoteDatabase
@@ -29,7 +30,8 @@ class AddNoteFragment : BaseFragment() {
         //we will pass contex (as a activity) here. it is not null(!!)
         //when we write  NoteDatabase(activity!!) this it will call invoke method from NoteDatabase class
         // NoteDatabase(activity!!).getNoteDao()
-        floatingButtonSaveNote.setOnClickListener {
+        floatingButtonSaveNote.setOnClickListener {view->
+
             val noteTitle = edit_text_title.text.toString().trim()
             val noteBody = edit_text_note.text.toString().trim()
 
@@ -48,6 +50,9 @@ class AddNoteFragment : BaseFragment() {
                 context?.let {
                     NoteDatabase(it).getNoteDao().addNote(note)
                     it.toast("Note saved")
+
+                    val action= AddNoteFragmentDirections.actionSaveNotes()
+                    Navigation.findNavController(view).navigate(action)
                 }
             }
 

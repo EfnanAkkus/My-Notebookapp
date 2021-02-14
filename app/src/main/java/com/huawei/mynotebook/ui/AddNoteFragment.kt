@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
 
 class AddNoteFragment : BaseFragment() {
 
+   private var note: Note?=null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,6 +32,13 @@ class AddNoteFragment : BaseFragment() {
         //we will pass contex (as a activity) here. it is not null(!!)
         //when we write  NoteDatabase(activity!!) this it will call invoke method from NoteDatabase class
         // NoteDatabase(activity!!).getNoteDao()
+
+        //we receive the arguments for updating notes
+        arguments?.let {
+            note=AddNoteFragmentArgs.fromBundle(it).note
+            edit_text_title.setText(note?.title)
+            edit_text_note.setText(note?.note)
+        }
         floatingButtonSaveNote.setOnClickListener {view->
 
             val noteTitle = edit_text_title.text.toString().trim()
@@ -46,10 +55,19 @@ class AddNoteFragment : BaseFragment() {
                 return@setOnClickListener
             }
             launch {
-                val note = Note(noteTitle, noteBody)
                 context?.let {
-                    NoteDatabase(it).getNoteDao().addNote(note)
-                    it.toast("Note saved")
+                    val mNote = Note(noteTitle, noteBody)
+
+                    if(note == null){
+                        NoteDatabase(it).getNoteDao().addNote(mNote)
+                        it.toast("Note saved")
+                    }else{
+                        mNote.id=note!!.id
+                        NoteDatabase(it).getNoteDao().updateNote(mNote)
+                        it.toast("Note updated")
+                    }
+
+
 
                     val action= AddNoteFragmentDirections.actionSaveNotes()
                     Navigation.findNavController(view).navigate(action)

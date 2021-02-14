@@ -3,12 +3,14 @@ package com.huawei.mynotebook.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.huawei.mynotebook.R
 import com.huawei.mynotebook.db.Note
 import kotlinx.android.synthetic.main.note_layout.view.*
 
-class NotesAdapter(private val notes: List<Note>) : RecyclerView.Adapter<NotesAdapter.NoteViewHolder>(){
+class NotesAdapter(private val notes: List<Note>) :
+    RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -21,8 +23,14 @@ class NotesAdapter(private val notes: List<Note>) : RecyclerView.Adapter<NotesAd
     override fun getItemCount() = notes.size
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.view.text_view_title.text=notes[position].title
-        holder.view.text_view_description.text=notes[position].note
+        holder.view.text_view_title.text = notes[position].title
+        holder.view.text_view_description.text = notes[position].note
+
+        holder.view.setOnClickListener {
+            val action = HomeFragmentDirections.actionAddNote()
+            action.note=notes[position]
+            Navigation.findNavController(it).navigate(action)
+        }
     }
 
     class NoteViewHolder(val view: View) : RecyclerView.ViewHolder(view)

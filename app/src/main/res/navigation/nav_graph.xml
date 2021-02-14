@@ -22,5 +22,10 @@
         <action
             android:id="@+id/action_save_notes"
             app:destination="@id/homeFragment" />
+        <argument
+            app:argType="com.huawei.mynotebook.db.Note"
+            android:name="Note"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 </navigation>

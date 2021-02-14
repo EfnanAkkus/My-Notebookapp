@@ -1,12 +1,11 @@
 package com.huawei.mynotebook.ui
 
+import android.app.AlertDialog
 import android.os.AsyncTask
 import android.os.Bundle
 import android.renderscript.Script
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.Navigation
 import com.huawei.mynotebook.R
@@ -17,12 +16,14 @@ import kotlinx.coroutines.launch
 
 class AddNoteFragment : BaseFragment() {
 
-   private var note: Note?=null
+    private var note: Note? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+//buraya delete option ekliyoruz
+        setHasOptionsMenu(true)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_add_note, container, false)
     }
@@ -35,11 +36,11 @@ class AddNoteFragment : BaseFragment() {
 
         //we receive the arguments for updating notes
         arguments?.let {
-            note=AddNoteFragmentArgs.fromBundle(it).note
+            note = AddNoteFragmentArgs.fromBundle(it).note
             edit_text_title.setText(note?.title)
             edit_text_note.setText(note?.note)
         }
-        floatingButtonSaveNote.setOnClickListener {view->
+        floatingButtonSaveNote.setOnClickListener { view ->
 
             val noteTitle = edit_text_title.text.toString().trim()
             val noteBody = edit_text_note.text.toString().trim()
@@ -58,18 +59,17 @@ class AddNoteFragment : BaseFragment() {
                 context?.let {
                     val mNote = Note(noteTitle, noteBody)
 
-                    if(note == null){
+                    if (note == null) {
                         NoteDatabase(it).getNoteDao().addNote(mNote)
                         it.toast("Note saved")
-                    }else{
-                        mNote.id=note!!.id
+                    } else {
+                        mNote.id = note!!.id
                         NoteDatabase(it).getNoteDao().updateNote(mNote)
                         it.toast("Note updated")
                     }
 
 
-
-                    val action= AddNoteFragmentDirections.actionSaveNotes()
+                    val action = AddNoteFragmentDirections.actionSaveNotes()
                     Navigation.findNavController(view).navigate(action)
                 }
             }
@@ -86,5 +86,34 @@ class AddNoteFragment : BaseFragment() {
 
     }
 
+    private fun deleteNote() {
+        AlertDialog.Builder(context).apply {
+            setTitle("Are you sure?")
+            setMessage("You can not undo this operation")
+            setPositiveButton("Yes") { _, _ ->
+                launch {
+                    //!! bunu koymamızın sebebi boş olmadığından emin olmak için
+                    NoteDatabase(context).getNoteDao().deleteNote(note!!)
+                    //notu sildikten sonra fragmenta geri döneceğiz bunun için aşağıdaki metodu çalıştıracağız
+                    val action = AddNoteFragmentDirections.actionSaveNotes()
+                    Navigation.findNavController(view!!).navigate(action)
+                }
+            }
+            setNegativeButton("No") { _, _ ->
 
+            }
+        }.create().show()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.delete -> if (note != null) deleteNote() else context?.toast("Can not delete")
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.manu, menu)
+    }
 }
